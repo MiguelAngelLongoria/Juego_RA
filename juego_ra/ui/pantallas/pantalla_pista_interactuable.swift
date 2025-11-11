@@ -7,11 +7,10 @@
 
 import SwiftUI
 
-struct PantallaPïstaInformacion: View {
-    var cuerpo_pista : PistaInformacion
+struct PantallaPistaInformacion: View {
+    var cuerpo_pista: PistaInformacion
     
     var body: some View {
         Text(cuerpo_pista.informacion)
-        
     }
 }

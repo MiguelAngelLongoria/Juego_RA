@@ -11,7 +11,7 @@ import SwiftUI
 struct juego_raApp: App {
     var body: some Scene {
         WindowGroup {
-            Pantalla_principal()
+            PantallaPrincipal()
         }
     }
 }

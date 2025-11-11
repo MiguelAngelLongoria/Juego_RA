@@ -26,5 +26,5 @@ struct PistaInteractuable: CuerpoPista{
     
     var informacion: String
     
-    var intereacciones: [Boton]
+    var interacciones: [Boton]
 }
