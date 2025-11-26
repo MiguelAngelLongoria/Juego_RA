@@ -4,7 +4,6 @@
 //
 //  Created by Miguel Angel Longoria Granados on 10/11/25.
 //
-
 import SwiftUI
 struct PantallaPistaInteractuable: View {
     var cuerpo_pista : PistaInteractuable
@@ -39,4 +38,3 @@ struct PantallaPistaInteractuable: View {
                           ))
     .environment(ControladorJuego())
 }
-

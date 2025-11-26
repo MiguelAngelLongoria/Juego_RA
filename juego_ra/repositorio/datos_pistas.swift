@@ -4,6 +4,7 @@
 //
 //  Created by Miguel Angel Longoria Granados on 05/11/25.
 //
+
 import CoreLocation
 
 let pistas = [
@@ -93,6 +94,3 @@ let pistas = [
 ]
 
      */
-
-
-

@@ -5,7 +5,6 @@
 //  Created by Miguel Angel Longoria Granados on 12/11/25.
 //
 
-
 import SwiftUI
 import AVFoundation
 
