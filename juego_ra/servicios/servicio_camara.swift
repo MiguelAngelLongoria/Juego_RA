@@ -6,7 +6,6 @@
 //  Created by Miguel Angel Longoria Granados on 12/11/25.
 //
 
-
 import Foundation
 import AVFoundation
 import UIKit
@@ -15,101 +14,89 @@ import UIKit
 class ServicioCamara: NSObject, AVCaptureMetadataOutputObjectsDelegate {
     
     private let sesion = AVCaptureSession()
-        
-    private var entrada_del_dispositivo: AVCaptureDeviceInput?
-    private var salida_de_video: AVCaptureVideoDataOutput?
-    
     private var previsualizacion: AVCaptureVideoPreviewLayer?
     
-    // --- NUEVO: Salida para leer QR y códigos de barra ---
     private let salidaCodigos = AVCaptureMetadataOutput()
     
-    // Callback para mandar el código detectado
+    // Callback del código
     var codigoDetectado: ((String) -> Void)?
-    // ----------------------------------------------------
     
-    private let tipo_camara_preferida = AVCaptureDevice.default(for: .video)
-    
-    private var lista_de_sesion = DispatchQueue(label: "sesion.video")
-    
+    private let colaSesion = DispatchQueue(label: "sesion.video")
     
     // MARK: - AUTORIZACIÓN
     func autorizacion_camara() async -> Bool {
-        let estado_autorizacion = AVCaptureDevice.authorizationStatus(for: .video)
+        let estado = AVCaptureDevice.authorizationStatus(for: .video)
         
-        if estado_autorizacion == .notDetermined {
-            await AVCaptureDevice.requestAccess(for: .video)
+        if estado == .notDetermined {
+            let aceptado = await AVCaptureDevice.requestAccess(for: .video)
+            return aceptado
         }
         
-        return estado_autorizacion == .authorized
+        return estado == .authorized
     }
     
-    
-    // MARK: - INIT
     override init() {
         super.init()
+        
         Task {
-            await autorizacion_camara()
+            let ok = await autorizacion_camara()
+            if !ok {
+                print("⚠️ No hay permiso de cámara")
+            }
         }
     }
     
     
-    // MARK: - INICIAR CÁMARA + DETECCIÓN
+    // MARK: - INICIAR
     func iniciar() {
-        guard let dispositivo = AVCaptureDevice.default(for: .video),
-              let entrada = try? AVCaptureDeviceInput(device: dispositivo),
-              sesion.canAddInput(entrada)
-        else {
-            return
-        }
-        
-        sesion.beginConfiguration()
-        
-        // Entrada de cámara
-        sesion.addInput(entrada)
-        
-        
-        // --- NUEVO: Salida para códigos ---
-        if sesion.canAddOutput(salidaCodigos) {
-            sesion.addOutput(salidaCodigos)
-            salidaCodigos.setMetadataObjectsDelegate(self, queue: .main)
+        colaSesion.async { [weak self] in
+            guard let self else { return }
             
-            // Tipos que la cámara podrá leer
-            salidaCodigos.metadataObjectTypes = [
-                .qr,
-                .ean8,
-                .ean13,
-                .code128,
-                .code39,
-                .code93,
-                .upce,
-                .pdf417,
-                .aztec,
-                .dataMatrix
-            ]
+            guard let dispositivo = AVCaptureDevice.default(for: .video),
+                  let entrada = try? AVCaptureDeviceInput(device: dispositivo)
+            else { return }
+            
+            self.sesion.beginConfiguration()
+            
+            if self.sesion.canAddInput(entrada) {
+                self.sesion.addInput(entrada)
+            }
+            
+            // Salida para QR y códigos de barra
+            if self.sesion.canAddOutput(self.salidaCodigos) {
+                self.sesion.addOutput(self.salidaCodigos)
+                
+                self.salidaCodigos.setMetadataObjectsDelegate(self, queue: .main)
+                self.salidaCodigos.metadataObjectTypes = [
+                    .qr, .ean8, .ean13, .code128, .code39, .code93,
+                    .upce, .pdf417, .aztec, .dataMatrix
+                ]
+            }
+            
+            self.sesion.commitConfiguration()
+            self.sesion.startRunning()
         }
-        // ---------------------------------
-        
-        
-        sesion.commitConfiguration()
-        sesion.startRunning()
     }
     
     
     // MARK: - DETENER
     func detener() {
-        sesion.stopRunning()
-        
-        sesion.beginConfiguration()
-        sesion.inputs.forEach { sesion.removeInput($0) }
-        sesion.outputs.forEach { sesion.removeOutput($0) }
-        sesion.commitConfiguration()
-        
-        previsualizacion = nil
+        colaSesion.async { [weak self] in
+            guard let self else { return }
+            
+            self.sesion.stopRunning()
+            
+            self.sesion.beginConfiguration()
+            self.sesion.inputs.forEach { self.sesion.removeInput($0) }
+            self.sesion.outputs.forEach { self.sesion.removeOutput($0) }
+            self.sesion.commitConfiguration()
+            
+            self.previsualizacion = nil
+        }
     }
     
     
-    // MARK: - PREVISUALIZACIÓN
+    // MARK: - PREVIEW
     func obtener_previsualizacion_camara() -> AVCaptureVideoPreviewLayer {
         if let capa = previsualizacion {
             return capa
@@ -117,22 +104,26 @@ class ServicioCamara: NSObject, AVCaptureMetadataOutputObjectsDelegate {
         
         let capa = AVCaptureVideoPreviewLayer(session: sesion)
         capa.videoGravity = .resizeAspectFill
-        previsualizacion = capa
+        self.previsualizacion = capa
         return capa
     }
     
     
-    // MARK: - DELEGADO DE CÓDIGOS DETECTADOS
+    // MARK: - LECTURA DE CÓDIGOS
     func metadataOutput(_ output: AVCaptureMetadataOutput,
                         didOutput metadataObjects: [AVMetadataObject],
                         from connection: AVCaptureConnection) {
         
         guard let objeto = metadataObjects.first as? AVMetadataMachineReadableCodeObject,
-              let valor = objeto.stringValue
-        else { return }
+              let valor = objeto.stringValue else { return }
         
-        // Enviar el valor detectado
+        // Para evitar spam excesivo
+        sesion.stopRunning()
         codigoDetectado?(valor)
+        
+        // Vuelve a iniciar tras 1 segundo para no trabar el UI
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            self.sesion.startRunning()
+        }
     }
 }
-
