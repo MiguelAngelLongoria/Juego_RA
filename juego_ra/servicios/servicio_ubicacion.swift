@@ -4,7 +4,7 @@
 //
 //  Created by Jadzia Gallegos on 05/11/25.
 //
- 
+
 import Foundation
 import CoreLocation
 

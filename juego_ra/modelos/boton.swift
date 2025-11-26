@@ -5,8 +5,7 @@
 //  Created by Miguel Angel Longoria Granados on 10/11/25.
 //
 import Foundation
-
-struct Boton: Identifiable{
+struct boton:Identifiable{
     var id = UUID()
     let mensaje: String
     let conecta_con_pista: String

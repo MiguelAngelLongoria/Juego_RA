@@ -11,6 +11,7 @@ enum TiposDePista{
 }
 
 protocol CuerpoPista{
+    
     var tipo: TiposDePista { get set }
     var informacion: String { get set }
 }
@@ -22,9 +23,12 @@ struct PistaInformacion: CuerpoPista{
 }
 
 struct PistaInteractuable: CuerpoPista{
-    var tipo = TiposDePista.interactiva
-    
     var informacion: String
     
-    var interacciones: [Boton]
+    var tipo = TiposDePista.interactiva
+    
+    var interacciones: [boton]
+    
+    
 }
+

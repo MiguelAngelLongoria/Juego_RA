@@ -254,6 +254,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSCameraUsageDescription = "esto es apra ver que anadas haciendo como el ojo de sauron";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "segundo permiso";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "para solicitar permisos de usar la unicacion, su descripcion";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "tercer permiso";
@@ -297,6 +298,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSCameraUsageDescription = "esto es apra ver que anadas haciendo como el ojo de sauron";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "segundo permiso";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "para solicitar permisos de usar la unicacion, su descripcion";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "tercer permiso";
