@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CoreLocation
 
 struct Pantalla_principal: View {
     @State var proveedor_ubicacion = ServicioUbicacion()
@@ -18,7 +19,29 @@ struct Pantalla_principal: View {
                 .ignoresSafeArea()
 
             VStack(spacing: 25) {
+                // PANEL DE UBICACIÓN
+                if let ubicacion = proveedor_ubicacion.ubicacion_actual {
+                    VStack(spacing: 4) {
+                        Text("📍 Tu ubicación actual")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                        
+                        Text("Latitud: \(ubicacion.coordinate.latitude)")
+                            .foregroundColor(.white.opacity(0.9))
+                            .font(.subheadline)
+
+                        Text("Longitud: \(ubicacion.coordinate.longitude)")
+                            .foregroundColor(.white.opacity(0.9))
+                            .font(.subheadline)
+                    }
+                    .padding(10)
+                    .background(Color.black.opacity(0.45))
+                    .cornerRadius(12)
+                    .padding(.bottom, 10)
+                }
+
                 
+                // Título
                 Text("Pistas entre las Pinturas")
                     .font(.custom("Didot", size: 36))
                     .foregroundColor(.yellow)
@@ -43,21 +66,81 @@ struct Pantalla_principal: View {
                 
                 NavigationStack {
                     VStack(spacing: 22) {
-                        // LISTA DE PISTAS (1 a 4)
-                        NavigationLink("Pista 1") { PantallaPista1() }
-                            .modifier(BotonPista())
+                        ForEach(Array(pistas.enumerated()), id: \.element.id) { index, pista in
+                            
+                            VStack(spacing: 8) {
+                                
+                                // ESTADO 1 — LEJOS
+                                if !pista.esta_en_rango(ubicacion: proveedor_ubicacion.ubicacion_actual) {
+                                    // Distancia a esta pista
+                                    if let userLoc = proveedor_ubicacion.ubicacion_actual {
+                                        let distancia = userLoc.distance(from: pista.ubicacion)
+                                        
+                                        Text(String(format: "Distancia a esta pista: %.1f metros", distancia))
+                                            .font(.caption)
+                                            .foregroundColor(.white.opacity(0.85))
+                                            .padding(6)
+                                            .background(Color.black.opacity(0.25))
+                                            .cornerRadius(8)
+                                    }
 
-                        NavigationLink("Pista 2") { PantallaPista2() }
-                            .modifier(BotonPista())
-
-                        NavigationLink("Pista 3") { PantallaPista3() }
-                            .modifier(BotonPista())
-
-                        NavigationLink("Pista 4") { PantallaPista4() }
-                            .modifier(BotonPista())
+                                    Text("🖼️ No estás cerca de la pista \(index + 1)")
+                                        .foregroundColor(.white.opacity(0.75))
+                                        .padding(10)
+                                        .background(Color.black.opacity(0.3))
+                                        .cornerRadius(10)
+                                    
+                                } else {
+                                    
+                                    // ESTADO 2 — EN RANGO NORMAL (mostrar botón)
+                                    NavigationLink {
+                                        switch index {
+                                        case 0: PantallaPista1()
+                                        case 1: PantallaPista2()
+                                        case 2: PantallaPista3()
+                                        case 3: PantallaPista4()
+                                        default: Text("Pista no disponible")
+                                        }
+                                    } label: {
+                                        Text("Pista \(index + 1)")
+                                            .font(.custom("Didot", size: 36))
+                                            .frame(width: 300, height: 100)
+                                            .background(
+                                                LinearGradient(
+                                                    colors: [.yellow, .orange],
+                                                    startPoint: .topLeading,
+                                                    endPoint: .bottomTrailing
+                                                )
+                                            )
+                                            .foregroundColor(.black)
+                                            .border(Color.black)
+                                            .cornerRadius(14)
+                                            .shadow(color: .yellow.opacity(0.7), radius: 8)
+                                    }
+                                    
+                                    // ESTADO 3 — MUY CERCA (≤ distancia_minima)
+                                    if pista.puede_ser_recogida(ubicacion: proveedor_ubicacion.ubicacion_actual) {
+                                        
+                                        HStack {
+                                            Image(systemName: "qrcode.viewfinder")
+                                                .foregroundColor(.green)
+                                            Text("¡Ya puedes escanear la pista!")
+                                                .font(.headline)
+                                                .foregroundColor(.green)
+                                        }
+                                        .padding(8)
+                                        .background(Color.white.opacity(0.8))
+                                        .cornerRadius(12)
+                                        .shadow(radius: 5)
+                                        .padding(.top, -10)
+                                    }
+                                }
+                            }
+                            .padding(.bottom, 12)
+                        }
                     }
                 }
-
+                
                 Spacer()
             }
             .padding(.bottom, 40)
