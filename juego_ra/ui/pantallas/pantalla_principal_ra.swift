@@ -10,7 +10,23 @@ import CoreLocation
 
 struct Pantalla_principal: View {
     @State var proveedor_ubicacion = ServicioUbicacion()
-    
+    func colorSegunDistancia(_ pista: Pista) -> Color {
+        guard let userLoc = proveedor_ubicacion.ubicacion_actual else {
+            return Color.gray.opacity(0.7)
+        }
+
+        let distancia = userLoc.distance(from: pista.ubicacion)
+
+        switch distancia {
+        case 0..<5:
+            return Color.green.opacity(0.8)   // Muy cerca
+        case 5..<20:
+            return Color.yellow.opacity(0.8) // Medio
+        default:
+            return Color.red.opacity(0.8)    // Lejos
+        }
+    }
+
     var body: some View {
         ZStack {
             Image("2")
@@ -22,7 +38,7 @@ struct Pantalla_principal: View {
                 // PANEL DE UBICACIÓN
                 if let ubicacion = proveedor_ubicacion.ubicacion_actual {
                     VStack(spacing: 4) {
-                        Text("📍 Tu ubicación actual")
+                        Text(" Tu ubicación actual")
                             .font(.headline)
                             .foregroundColor(.white)
                         
@@ -106,18 +122,23 @@ struct Pantalla_principal: View {
                                             .font(.custom("Didot", size: 36))
                                             .frame(width: 300, height: 100)
                                             .background(
-                                                LinearGradient(
-                                                    colors: [.yellow, .orange],
-                                                    startPoint: .topLeading,
-                                                    endPoint: .bottomTrailing
-                                                )
+                                                colorSegunDistancia(pista)
                                             )
+
                                             .foregroundColor(.black)
                                             .border(Color.black)
                                             .cornerRadius(14)
                                             .shadow(color: .yellow.opacity(0.7), radius: 8)
                                     }
                                     
+                                    Text("Lat: \(pista.ubicacion.coordinate.latitude)")
+                                        .foregroundColor(.white)
+                                        .font(.caption)
+
+                                    Text("Lon: \(pista.ubicacion.coordinate.longitude)")
+                                        .foregroundColor(.white)
+                                        .font(.caption)
+
                                     // ESTADO 3 — MUY CERCA (≤ distancia_minima)
                                     if pista.puede_ser_recogida(ubicacion: proveedor_ubicacion.ubicacion_actual) {
                                         
@@ -167,203 +188,11 @@ struct BotonPista: ViewModifier {
             .padding(22)
     }
 }
-struct PantallaPista1: View {
-    @State private var mostrarCamara = false
-    
-    var body: some View {
-        ZStack {
-            Image("3")
-                .resizable()
-                .scaledToFill()
-                .ignoresSafeArea()
-            
-            VStack(spacing: 20) {
-                
-                Image(systemName: "cup.and.heat.waves")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 200, height: 200)
-                    .foregroundColor(.brown)
-                    .shadow(radius: 12)
-                    .padding()
-                    .background(Color.white.opacity(0.6))
-                    .cornerRadius(20)
-                    .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.black, lineWidth: 2))
-                
-                Text("Pista 1: Noche en el café")
-                    .font(.custom("Didot", size: 40))
-                    .foregroundColor(.black)
-                    .padding()
-                    .background(Color.white)
-                    .border(Color.black)
-                    .cornerRadius(20)
 
-                Text("Donde el aroma despierta a los hambreados. No solo rugen los estómagos: también las billeteras tiemblan, aunque el sabor apenas alcanza. Tu pista te espera en la entrada.")
-                    .font(.custom("Didot", size: 22))
-                    .padding()
-                    .background(Color.white.opacity(0.55))
-                    .cornerRadius(18)
-                    .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color.black.opacity(0.7)))
-                    .padding(30)
 
-                Button("Comenzar Búsqueda") { mostrarCamara = true }
-                    .modifier(BotonBusqueda())
 
-            }
-            .navigationTitle("Pista 1")
-            .sheet(isPresented: $mostrarCamara) {
-                VistaCamara(pistaActual: 1)
-            }
-        }
-    }
-}
 
-struct PantallaPista2: View {
-    @State private var mostrarCamara = false
-    
-    var body: some View {
-        ZStack {
-            Image("7")
-                .resizable()
-                .scaledToFill()
-                .ignoresSafeArea()
 
-            VStack(spacing: 20) {
-                
-                Image(systemName: "tree.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 200, height: 200)
-                    .foregroundColor(.green)
-                    .shadow(radius: 12)
-                    .padding()
-                    .background(Color.white.opacity(0.6))
-                    .cornerRadius(20)
-                    .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.black, lineWidth: 2))
-
-                Text("Pista 2: El Árbol del Umbral")
-                    .font(.custom("Didot", size: 40))
-                    .padding()
-                    .background(Color.white)
-                    .cornerRadius(20)
-                    .border(Color.black)
-
-                Text("No todos los pilares son de concreto. Algunos respiran, y nos permiten respirar. Tu seña será verde como un semáforo y café como la tierra que lo sostiene.")
-                    .font(.custom("Didot", size: 22))
-                    .padding()
-                    .background(Color.white.opacity(0.55))
-                    .cornerRadius(18)
-                    .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color.black.opacity(0.7)))
-                    .padding(30)
-
-                Button("Comenzar Búsqueda") { mostrarCamara = true }
-                    .modifier(BotonBusqueda())
-            }
-            .navigationTitle("Pista 2")
-            .sheet(isPresented: $mostrarCamara) {
-                VistaCamara(pistaActual: 2)
-            }
-        }
-    }
-}
-
-struct PantallaPista3: View {
-    @State private var mostrarCamara = false
-    
-    var body: some View {
-        ZStack {
-            Image("9")
-                .resizable()
-                .scaledToFill()
-                .ignoresSafeArea()
-
-            VStack(spacing: 20) {
-                
-                Image(systemName: "desktopcomputer")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 200, height: 200)
-                    .foregroundColor(.gray)
-                    .shadow(radius: 12)
-                    .padding()
-                    .background(Color.white.opacity(0.6))
-                    .cornerRadius(20)
-                    .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.black, lineWidth: 2))
-
-                Text("Pista 3: El Arte de las Computadoras")
-                    .font(.custom("Didot", size: 40))
-                    .padding()
-                    .background(Color.white)
-                    .cornerRadius(20)
-                    .border(Color.black)
-
-                Text("Aquí se mezclan diseñadores e ingenieros; aquí las materias se invierten como un reflejo en el agua. Sigue donde el conocimiento cambia de forma.")
-                    .font(.custom("Didot", size: 22))
-                    .padding()
-                    .background(Color.white.opacity(0.55))
-                    .cornerRadius(18)
-                    .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color.black.opacity(0.7)))
-                    .padding(30)
-
-                Button("Comenzar Búsqueda") { mostrarCamara = true }
-                    .modifier(BotonBusqueda())
-            }
-            .navigationTitle("Pista 3")
-            .sheet(isPresented: $mostrarCamara) {
-                VistaCamara(pistaActual: 3)
-            }
-        }
-    }
-}
-
-struct PantallaPista4: View {
-    @State private var mostrarCamara = false
-    
-    var body: some View {
-        ZStack {
-            Image("6")
-                .resizable()
-                .scaledToFill()
-                .ignoresSafeArea()
-
-            VStack(spacing: 20) {
-                
-                Image(systemName: "hanger")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 200, height: 200)
-                    .foregroundColor(.gray)
-                    .shadow(radius: 12)
-                    .padding()
-                    .background(Color.white.opacity(0.6))
-                    .cornerRadius(20)
-                    .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.black, lineWidth: 2))
-
-                Text("Edificio de Tejedores y Grabaciones")
-                    .font(.custom("Didot", size: 40))
-                    .padding()
-                    .background(Color.white)
-                    .cornerRadius(20)
-                    .border(Color.black)
-
-                Text("Dicen que es el pilar más joven, lleno de vida y siempre despierto. Aquí los tejedores crean sin ruido, las grabaciones fluyen sin problema, y las manzanas… no se comen.")
-                    .font(.custom("Didot", size: 22))
-                    .padding()
-                    .background(Color.white.opacity(0.55))
-                    .cornerRadius(18)
-                    .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color.black.opacity(0.7)))
-                    .padding(30)
-
-                Button("Comenzar Búsqueda") { mostrarCamara = true }
-                    .modifier(BotonBusqueda())
-            }
-            .navigationTitle("Pista 4")
-            .sheet(isPresented: $mostrarCamara) {
-                VistaCamara(pistaActual: 4)
-            }
-        }
-    }
-}
 
 struct BotonBusqueda: ViewModifier {
     func body(content: Content) -> some View {

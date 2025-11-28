@@ -9,20 +9,20 @@ import SwiftUI
 import CoreLocation
 
 struct DetallePista: View {
-    var pista: Pista  // Pista es el modelo que tienes para representar las pistas
+    var pista: Pista
 
     var body: some View {
         VStack {
-            // Título de la pista
+            // Título
             Text("Detalles de la Pista \(pista.id)")
                 .font(.largeTitle)
                 .padding()
 
-            // Mostrar información de la pista
+            // Mostrar
             Text("Descripción: \(pista.cuerpo.informacion)")
                 .padding()
 
-            // Imagen de la pista
+            // Imagen
             AsyncImage(url: pista.imagenURL) { estado in
                 switch estado {
                 case .empty:
@@ -42,7 +42,7 @@ struct DetallePista: View {
             }
             .padding()
 
-            Spacer()  // Para empujar el contenido hacia arriba
+            Spacer()  // Para 
         }
         .padding()
         .navigationTitle("Pista \(pista.id)")

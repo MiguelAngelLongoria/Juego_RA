@@ -10,7 +10,7 @@ import CoreLocation
 let pistas = [
     Pista(
         ubicacion:
-            CLLocation(latitude: 31.74211835729694, longitude: -106.43233447079758),
+            CLLocation(latitude: 31.7430402136247, longitude: -106.43246030993306),
         
         id: "pista_1",
         cuerpo:
@@ -22,8 +22,9 @@ let pistas = [
     
     Pista(
         ubicacion: CLLocation(
-            latitude: 31.743458187185613,
-            longitude:  -106.43191414183958
+            latitude: 31.742664354937443,
+            longitude:  -106.43230831667267
+            
         ),
         id: "pista_2",
         cuerpo: PistaInteractuable(
@@ -39,8 +40,9 @@ let pistas = [
     
     Pista(
         ubicacion: CLLocation(
-            latitude: 31.742948858299005,
-            longitude:  -106.43187965117663
+            latitude: 31.743458059637607,
+            longitude:  -106.43203773121121,
+        
         ),
         id: "pista_3",
         cuerpo: PistaInteractuable(
@@ -56,8 +58,9 @@ let pistas = [
     
     Pista(
         ubicacion: CLLocation(
-            latitude: 31.742944076928865,
-            longitude:  -106.43256333360812
+            latitude: 31.742127515428756,
+            longitude:  -106.4324079446212
+            
         ),
         id: "pista_4",
         cuerpo: PistaInteractuable(
